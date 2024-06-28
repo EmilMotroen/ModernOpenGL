@@ -10,6 +10,7 @@ const char* APP_TITLE = "Introduction to Modern OpenGL";
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 GLFWwindow* window = NULL;
+bool wireframe = false;
 
 
 const GLchar* vertexShaderSrc =
@@ -39,19 +40,19 @@ int main() {
 
     // Separate buffers layout
     GLfloat vertices[] = {
-        // Triangle 0
         -0.5f,  0.5f, 0.0f,  
          0.5f,  0.5f, 0.0f,  
-         0.5f, -0.5f, 0.0f,
-
-         // Triangle 1
-        -0.5f,  0.5f, 0.0f,
          0.5f, -0.5f, 0.0f,
         -0.5f, -0.5f, 0.0f
     };
 
+    GLuint indices[] = {
+        0, 1, 2,    // Triangle 0
+        0, 2, 3     // Triangle 1
+    };
+
     
-    GLuint vbo, vao;
+    GLuint vbo, ibo, vao;
 
     
     glGenBuffers(1, &vbo);
@@ -65,6 +66,10 @@ int main() {
     // position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray(0);
+
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs, 1, &vertexShaderSrc, NULL);
@@ -101,6 +106,8 @@ int main() {
 
     glDeleteShader(vs);
     glDeleteShader(fs);
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ibo);
 
 
     /* Main loop */
@@ -113,7 +120,7 @@ int main() {
 
         glUseProgram(shaderProgram);
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         glfwSwapBuffers(window);
@@ -164,6 +171,17 @@ bool initOpenGL() {
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+        wireframe = !wireframe;
+
+        if (wireframe) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
     }
 }
 
