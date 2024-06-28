@@ -15,19 +15,15 @@ GLFWwindow* window = NULL;
 const GLchar* vertexShaderSrc =
 "#version 450 core\n"
 "layout (location = 0) in vec3 pos;"
-"layout (location = 1) in vec3 color;"
-"out vec3 vert_color;"
 "void main(){"
-"   vert_color = color;"
 "   gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);"
 "}";
 
 const GLchar* fragmentShaderSrc =
 "#version 450 core\n"
-"in vec3 vert_color;"
 "out vec4 frag_color;"
 "void main(){"
-"   frag_color = vec4(vert_color, 1.0f);"
+"   frag_color = vec4(0.35f, 0.96f, 0.3f, 1.0f);"
 "}";
 
 
@@ -42,40 +38,33 @@ int main() {
     }
 
     // Separate buffers layout
-    GLfloat vert_pos[] = {
-         0.0f,  0.5f, 0.0f,  // Top
-         0.5f, -0.5f, 0.0f,  // Right
-        -0.5f, -0.5f, 0.0f   // Left
+    GLfloat vertices[] = {
+        // Triangle 0
+        -0.5f,  0.5f, 0.0f,  
+         0.5f,  0.5f, 0.0f,  
+         0.5f, -0.5f, 0.0f,
+
+         // Triangle 1
+        -0.5f,  0.5f, 0.0f,
+         0.5f, -0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f
     };
 
-    GLfloat vert_color[] = {
-        1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f
-    };
-    GLuint vbo, vbo2, vao;
+    
+    GLuint vbo, vao;
 
     
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vert_pos), vert_pos, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &vbo2);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo2);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vert_color), vert_color, GL_STATIC_DRAW);
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
     // position
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray(0);
-
-    // color
-    glBindBuffer(GL_ARRAY_BUFFER, vbo2);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    glEnableVertexAttribArray(1);
 
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs, 1, &vertexShaderSrc, NULL);
@@ -124,7 +113,7 @@ int main() {
 
         glUseProgram(shaderProgram);
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
         glfwSwapBuffers(window);
