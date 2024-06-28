@@ -9,15 +9,36 @@
 const char* APP_TITLE = "Introduction to Modern OpenGL";
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
-const bool FULLSCREEN = false;
+GLFWwindow* window = NULL;
 
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void showFPS(GLFWwindow* window);
+bool initOpenGL();
 
 int main() {
-    if (!glfwInit()) {
+    if (!initOpenGL()) {
         std::cerr << "GLFW failed to initialize..." << std::endl;
         return -1;
+    }
+
+    /* Main loop */
+    while (!glfwWindowShouldClose(window)) {
+        showFPS(window);
+        glfwPollEvents();
+
+        
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glfwSwapBuffers(window);
+    }
+
+    glfwTerminate();
+}
+
+bool initOpenGL() {
+    if (!glfwInit()) {
+        std::cerr << "GLFW failed to initialize..." << std::endl;
+        return false;
     }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -25,49 +46,28 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    GLFWwindow* pWindow = NULL;
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, APP_TITLE, NULL, NULL);
 
-    if (FULLSCREEN) {
-        GLFWmonitor* pMonitor = glfwGetPrimaryMonitor();
-        const GLFWvidmode* pVmode = glfwGetVideoMode(pMonitor);
-        if (pVmode != NULL) {
-            pWindow = glfwCreateWindow(pVmode->width, pVmode->height, APP_TITLE, pMonitor, NULL);
-        }
-    }
-    else {
-        pWindow = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, APP_TITLE, NULL, NULL);
-    }
 
-    
-    if (pWindow == NULL) {
+    if (window == NULL) {
         std::cerr << "Failed to create GLFW window..." << std::endl;
         glfwTerminate();
-        return -1;
+        return false;
     }
 
-    glfwMakeContextCurrent(pWindow);
+    glfwMakeContextCurrent(window);
 
-    glfwSetKeyCallback(pWindow, glfw_onKey);
+    glfwSetKeyCallback(window, glfw_onKey);
 
     glewExperimental = GL_TRUE;
 
     if (glewInit() != GLEW_OK) {
         std::cerr << "GLEW failed to initialize..." << std::endl;
-        return -1;
+        return false;
     }
 
-    /* Main loop */
-    while (!glfwWindowShouldClose(pWindow)) {
-        showFPS(pWindow);
-        glfwPollEvents();
-
-        glClearColor(0.23f, 0.38f, 0.47f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        glfwSwapBuffers(pWindow);
-    }
-
-    glfwTerminate();
+    glClearColor(0.23f, 0.38f, 0.47f, 1.0f);
+    return true;
 }
 
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode) {
