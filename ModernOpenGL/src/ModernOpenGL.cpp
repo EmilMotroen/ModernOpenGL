@@ -29,7 +29,7 @@ const GLchar* fragmentShaderSrc =
 
 
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
-void showFPS(GLFWwindow* window);
+void showFPS();
 bool initOpenGL();
 
 int main() {
@@ -106,13 +106,11 @@ int main() {
 
     glDeleteShader(vs);
     glDeleteShader(fs);
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &ibo);
 
 
     /* Main loop */
     while (!glfwWindowShouldClose(window)) {
-        showFPS(window);
+        showFPS();
         glfwPollEvents();
         
         glClear(GL_COLOR_BUFFER_BIT);
@@ -128,6 +126,7 @@ int main() {
 
     glDeleteProgram(shaderProgram);
     glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &ibo);
     glDeleteBuffers(1, &vbo);
 
     glfwTerminate();
@@ -185,7 +184,7 @@ void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode)
     }
 }
 
-void showFPS(GLFWwindow* window) {
+void showFPS() {
     static double previousSeconds = 0.0;
     static int frameCount = 0;
     double elapsedSeconds;
