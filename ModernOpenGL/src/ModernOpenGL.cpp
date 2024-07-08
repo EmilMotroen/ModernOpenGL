@@ -5,26 +5,14 @@
 #include <iostream>
 #include <sstream>
 
+#include "ShaderProgram.h"
+
 
 const char* APP_TITLE = "Introduction to Modern OpenGL";
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 GLFWwindow* window = NULL;
 bool wireframe = false;
-
-const GLchar* vertexShaderSrc =
-"#version 450 core\n"
-"layout (location = 0) in vec3 pos;"
-"void main(){"
-"   gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);"
-"}";
-
-const GLchar* fragmentShaderSrc =
-"#version 450 core\n"
-"out vec4 frag_color;"
-"void main(){"
-"   frag_color = vec4(0.35f, 0.96f, 0.3f, 1.0f);"
-"}";
 
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void showFPS(GLFWwindow* window);
@@ -66,41 +54,10 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vs, 1, &vertexShaderSrc, NULL);
-    glCompileShader(vs);
+   
+    ShaderProgram shaderProgram;
+    shaderProgram.loadShaders("basic.vert", "basic.frag");
 
-    GLint result;
-    GLchar infoLog[512];
-    glGetShaderiv(vs, GL_COMPILE_STATUS, &result);
-    if (!result) {
-        glGetShaderInfoLog(vs, sizeof(infoLog), NULL, infoLog);
-        std::cout << "Error - Vertex shader failed to compile: " << infoLog << std::endl;
-    }
-
-    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fs, 1, &fragmentShaderSrc, NULL);
-    glCompileShader(fs);
-
-    glGetShaderiv(fs, GL_COMPILE_STATUS, &result);
-    if (!result) {
-        glGetShaderInfoLog(fs, sizeof(infoLog), NULL, infoLog);
-        std::cout << "Error - fragment shader failed to compile: " << infoLog << std::endl;
-    }
-
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vs);
-    glAttachShader(shaderProgram, fs);
-    glLinkProgram(shaderProgram);
-
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &result);
-    if (!result) {
-        glGetProgramInfoLog(shaderProgram, sizeof(infoLog), NULL, infoLog);
-        std::cout << "Error - Shader Program linker failed: " << infoLog << std::endl;
-    }
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
 
 
     /* Main loop */
@@ -110,8 +67,8 @@ int main() {
         
         glClear(GL_COLOR_BUFFER_BIT);
 
+        shaderProgram.use();
 
-        glUseProgram(shaderProgram);
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
@@ -119,7 +76,6 @@ int main() {
         glfwSwapBuffers(window);
     }
 
-    glDeleteProgram(shaderProgram);
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &ibo);
     glDeleteBuffers(1, &vbo);
