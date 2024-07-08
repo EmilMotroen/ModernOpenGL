@@ -3,6 +3,8 @@
 
 #include "GL/glew.h"
 #include <string>
+#include <map>
+#include "glm/glm.hpp"
 
 class ShaderProgram
 {
@@ -10,11 +12,7 @@ public:
 	ShaderProgram();
 	~ShaderProgram();
 
-	enum ShaderType {
-		VERTEX,
-		FRAGMENT,
-		PROGRAM
-	};
+	enum ShaderType { VERTEX, FRAGMENT, PROGRAM };
 
 	/// <summary>
 	/// Load the vertex and fragment shaders.
@@ -29,11 +27,17 @@ public:
 	/// </summary>
 	void use();
 
+	void setUniform(const GLchar* name, const glm::vec2& v);
+	void setUniform(const GLchar* name, const glm::vec3& v);
+	void setUniform(const GLchar* name, const glm::vec4& v);
+
 private:
 	std::string fileToString(const std::string& filename);
 	void checkCompileErrors(GLuint shader, ShaderType type);
+	GLint getUniformLocation(const GLchar* name);
 
 	GLuint handle;
+	std::map<std::string, GLint> uniformLocations;
 };
 
 #endif

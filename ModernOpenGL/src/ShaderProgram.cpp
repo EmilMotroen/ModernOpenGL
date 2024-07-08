@@ -41,6 +41,8 @@ bool ShaderProgram::loadShaders(const char* vsFilename, const char* fsFilename) 
     glDeleteShader(vs);
     glDeleteShader(fs);
 
+    uniformLocations.clear();
+
 	return true;
 }
 
@@ -70,6 +72,7 @@ std::string ShaderProgram::fileToString(const std::string& filename) {
 
 void ShaderProgram::checkCompileErrors(GLuint shader, ShaderType type) {
     int status = 0;
+
     if (type == PROGRAM) {
         glGetProgramiv(handle, GL_LINK_STATUS, &status);
         if (status == GL_FALSE) {
@@ -94,4 +97,28 @@ void ShaderProgram::checkCompileErrors(GLuint shader, ShaderType type) {
             std::cerr << "Error - Shader failed to compile: " << errorLog << std::endl;
         }
     }
+}
+
+GLint ShaderProgram::getUniformLocation(const GLchar* name) {
+    std::map<std::string, GLint>::iterator it = uniformLocations.find(name);
+    if (it == uniformLocations.end()) {
+        uniformLocations[name] = glGetUniformLocation(handle, name);
+    }
+
+    return uniformLocations[name];
+}
+
+void ShaderProgram::setUniform(const GLchar* name, const glm::vec2& v) {
+    GLint location = getUniformLocation(name);
+    glUniform2f(location, v.x, v.y);
+}
+
+void ShaderProgram::setUniform(const GLchar* name, const glm::vec3& v) {
+    GLint location = getUniformLocation(name);
+    glUniform3f(location, v.x, v.y, v.z);
+}
+
+void ShaderProgram::setUniform(const GLchar* name, const glm::vec4& v) {
+    GLint location = getUniformLocation(name);
+    glUniform4f(location, v.x, v.y, v.z, v.w);
 }
