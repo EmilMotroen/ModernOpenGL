@@ -12,7 +12,6 @@ const int WINDOW_HEIGHT = 600;
 GLFWwindow* window = NULL;
 bool wireframe = false;
 
-
 const GLchar* vertexShaderSrc =
 "#version 450 core\n"
 "layout (location = 0) in vec3 pos;"
@@ -27,9 +26,8 @@ const GLchar* fragmentShaderSrc =
 "   frag_color = vec4(0.35f, 0.96f, 0.3f, 1.0f);"
 "}";
 
-
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
-void showFPS();
+void showFPS(GLFWwindow* window);
 bool initOpenGL();
 
 int main() {
@@ -50,11 +48,9 @@ int main() {
         0, 1, 2,    // Triangle 0
         0, 2, 3     // Triangle 1
     };
-
     
     GLuint vbo, ibo, vao;
 
-    
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -63,7 +59,6 @@ int main() {
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    // position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray(0);
 
@@ -110,7 +105,7 @@ int main() {
 
     /* Main loop */
     while (!glfwWindowShouldClose(window)) {
-        showFPS();
+        showFPS(window);
         glfwPollEvents();
         
         glClear(GL_COLOR_BUFFER_BIT);
@@ -184,7 +179,7 @@ void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode)
     }
 }
 
-void showFPS() {
+void showFPS(GLFWwindow* window) {
     static double previousSeconds = 0.0;
     static int frameCount = 0;
     double elapsedSeconds;
