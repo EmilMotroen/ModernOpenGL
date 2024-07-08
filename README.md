@@ -1,2 +1,2 @@
 # ModernOpenGL
-Project following the "Learn Modern OpenGL" from O'Reilly. 
+Project following the "Learn Modern OpenGL" course from O'Reilly. 
